@@ -1,0 +1,17 @@
+load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/zoido/twirp-grpc
+gazelle(name = "gazelle")
+
+buildifier(
+    name = "buildifier",
+    lint_mode = "warn",
+    mode = "check",
+)
+
+buildifier(
+    name = "buildifier-fix",
+    lint_mode = "fix",
+    mode = "fix",
+)

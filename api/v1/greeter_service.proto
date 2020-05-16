@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package zoido.greeter;
+option go_package = "greeter";
+
+import "api/v1/greeting.proto";
+
+service GreeterService {
+  rpc GetGreeting(GetGreetingRequest) returns (GetGreetingResponse) { }
+}
+
+
+message GetGreetingRequest {
+  string name = 1;
+}
+
+message GetGreetingResponse {
+  Greeting greeting = 1;
+}
