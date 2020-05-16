@@ -14,6 +14,7 @@ import (
 
 	pb "github.com/zoido/twirp-grpc/api/v1"
 	"github.com/zoido/twirp-grpc/internal/service"
+	"github.com/zoido/twirp-grpc/internal/sterror"
 )
 
 func main() {
@@ -38,7 +39,11 @@ func main() {
 
 	svc := service.NewGreeterService()
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(
+		grpc.StreamInterceptor(sterror.StreamInterceptor()),
+		grpc.UnaryInterceptor(sterror.UnaryInterceptor()),
+	)
+
 	pb.RegisterGreeterServiceServer(srv, svc)
 	reflection.Register(srv)
 

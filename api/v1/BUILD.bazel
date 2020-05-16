@@ -4,7 +4,7 @@ load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
 load("@io_bazel_rules_go//proto:compiler.bzl", "go_proto_compiler")
 
 proto_library(
-    name = "zoido_greeter_proto",
+    name = "greeter_proto",
     srcs = [
         "greeter_service.proto",
         "greeting.proto",
@@ -13,24 +13,24 @@ proto_library(
 )
 
 go_proto_library(
-    name = "zoido_greeter_go_proto",
+    name = "greeter_go_proto",
     compilers = [
         "@io_bazel_rules_go//proto:go_grpc",
-        ":go_twirp",
+        ":go_twirp",  # keep
     ],
     importpath = "github.com/zoido/twirp-grpc/api/v1",
-    proto = ":zoido_greeter_proto",
+    proto = ":greeter_proto",
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_golang_protobuf//jsonpb:go_default_library",
         "@com_github_twitchtv_twirp//:go_default_library",
         "@com_github_twitchtv_twirp//ctxsetters:go_default_library",
-    ],
+    ],  # keep
 )
 
 go_library(
     name = "go_default_library",
-    embed = [":zoido_greeter_go_proto"],
+    embed = [":greeter_go_proto"],
     importpath = "github.com/zoido/twirp-grpc/api/v1",
     visibility = ["//visibility:public"],
 )

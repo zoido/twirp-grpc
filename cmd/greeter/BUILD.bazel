@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//api/v1:go_default_library",
         "//internal/service:go_default_library",
+        "//internal/sterror:go_default_library",
         "@com_github_rs_zerolog//:go_default_library",
         "@com_github_rs_zerolog//log:go_default_library",
         "@com_github_zoido_yag_config//:go_default_library",
