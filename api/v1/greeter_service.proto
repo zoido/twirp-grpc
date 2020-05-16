@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package zoido.greeter;
+option go_package = "greeter";
 
 import "api/v1/greeting.proto";
 

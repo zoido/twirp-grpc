@@ -26,7 +26,7 @@ go_rules_dependencies()
 
 go_register_toolchains()
 
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 
 gazelle_dependencies()
 
@@ -47,6 +47,15 @@ http_archive(
     name = "com_github_bazelbuild_buildtools",
     strip_prefix = "buildtools-master",
     url = "https://github.com/bazelbuild/buildtools/archive/master.zip",
+)
+
+# Go dependencies
+
+go_repository(
+    name = "com_github_twitchtv_twirp",
+    importpath = "github.com/twitchtv/twirp",
+    sum = "h1:EQbcEeV2mj5ZSyCem+r1aIBsm70doVGPkIu7GMAMgfg=",
+    version = "v5.10.2+incompatible",
 )
 
 load("//:repositories.bzl", "go_repositories")

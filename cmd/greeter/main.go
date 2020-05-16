@@ -2,6 +2,7 @@ package main
 
 import (
 	"net"
+	"net/http"
 	"os"
 	"time"
 
@@ -16,9 +17,11 @@ import (
 )
 
 func main() {
-	bind := "localhost:9911"
+	bindGrpc := "localhost:9911"
+	bindTwirp := "localhost:8011"
 	y := yag.New()
-	y.String(&bind, "bind", "address to listen on")
+	y.String(&bindGrpc, "bind_grpc", "address to listen on")
+	y.String(&bindTwirp, "bind_twirp", "address to listen on")
 
 	if err := y.Parse(os.Args[1:]); err != nil {
 		log.Fatal().
@@ -33,27 +36,51 @@ func main() {
 		},
 	)
 
-	listen, err := net.Listen("tcp", bind)
-	if err != nil {
-		log.Fatal().
-			Err(err).
-			Str("bind", bind).
-			Msg("failed to listen")
-	}
-
-	address := listen.Addr().(*net.TCPAddr)
-	log.Info().
-		Int("port", address.Port).
-		IPAddr("ip_address", address.IP).
-		Msg("Listening")
+	svc := service.NewGreeterService()
 
 	srv := grpc.NewServer()
-	pb.RegisterGreeterServiceServer(srv, service.NewGreeterService())
+	pb.RegisterGreeterServiceServer(srv, svc)
 	reflection.Register(srv)
 
-	if err := srv.Serve(listen); err != nil {
-		log.Fatal().
-			Err(err).
-			Msg("Failed to start the gRPC server")
-	}
+	twirpHandler := pb.NewGreeterServiceServer(svc, nil)
+
+	shutdown := make(chan bool)
+
+	go func() {
+		log.Info().
+			Str("bind", bindGrpc).
+			Msg("Listening")
+		listen, err := net.Listen("tcp", bindGrpc)
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Str("bind", bindGrpc).
+				Msg("failed to listen")
+		}
+		log.Info().
+			Str("bind", bindGrpc).
+			Msg("Starting gRPC server")
+		if err := srv.Serve(listen); err != nil {
+			log.Error().
+				Err(err).
+				Msg("Failed to start the gRPC server")
+		}
+		shutdown <- true
+	}()
+
+	go func() {
+		log.Info().
+			Str("bind", bindTwirp).
+			Msg("Starting Twirp HTTP server")
+
+		if err := http.ListenAndServe(bindTwirp, twirpHandler); err != nil {
+			log.Error().
+				Err(err).
+				Send()
+		}
+
+		shutdown <- true
+	}()
+
+	<-shutdown
 }
