@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package zoido.greeter;
+
+message Greeting {
+  string message = 1;
+}
